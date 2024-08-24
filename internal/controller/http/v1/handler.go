@@ -1,13 +1,9 @@
 package v1
 
-import (
-	"kode-notes/internal/service"
-	"time"
-)
+import "kode-notes/internal/service"
 
 type Handler struct {
 	services *service.Service
-	tokenTTL time.Duration
 }
 
 func NewHandler(services *service.Service) *Handler {
