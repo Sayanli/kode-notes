@@ -19,30 +19,30 @@ type (
 	}
 
 	App struct {
-		Name    string `env-required:"true" yaml:"name"    env:"APP_NAME"`
-		Version string `env-required:"true" yaml:"version" env:"APP_VERSION"`
+		Name    string `yaml:"name"    env:"APP_NAME"`
+		Version string `yaml:"version" env:"APP_VERSION"`
 	}
 
 	HTTP struct {
-		Port string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+		Port string `yaml:"port" env:"HTTP_PORT"`
 	}
 
 	Log struct {
-		Level string `env-required:"true" yaml:"level" env:"LOG_LEVEL"`
+		Level string `yaml:"level" env:"LOG_LEVEL"`
 	}
 
 	PG struct {
-		MaxPoolSize int    `env-required:"true" yaml:"max_pool_size" env:"PG_MAX_POOL_SIZE"`
-		URL         string `env-required:"true"                      env:"PG_URL"`
+		MaxPoolSize int    `yaml:"max_pool_size" env:"PG_MAX_POOL_SIZE"`
+		URL         string `yaml:"pg_url"`
 	}
 
 	JWT struct {
-		SignKey  string        `env-required:"true"                  env:"JWT_SIGN_KEY"`
-		TokenTTL time.Duration `env-required:"true" yaml:"token_ttl" env:"JWT_TOKEN_TTL"`
+		SignKey  string        `yaml:"jwt_sign_key"`
+		TokenTTL time.Duration `yaml:"jwt_token_ttl"`
 	}
 
 	Hasher struct {
-		Salt string `env-required:"true" env:"HASHER_SALT"`
+		Salt string `yaml:"hasher_salt"`
 	}
 )
 
@@ -52,11 +52,6 @@ func NewConfig(configPath string) (*Config, error) {
 	err := cleanenv.ReadConfig(path.Join("./", configPath), cfg)
 	if err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
-	}
-
-	err = cleanenv.UpdateEnv(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("error updating env: %w", err)
 	}
 
 	return cfg, nil

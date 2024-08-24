@@ -1,0 +1,20 @@
+app:
+  name: 'notes-service'
+  version: '1.0.0'
+
+http:
+  port: 8080
+
+log:
+  level: 'debug'
+
+postgres:
+  max_pool_size: 20
+  pg_url: 'postgres://postgres_user:postgres_password@postgres:5432/postgres_db'
+
+jwt:
+  token_ttl: 120m
+  jwt_sign_key: 'joiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSI'
+
+hasher:
+  hasher_salt: 'Jc3N1ZXI'
