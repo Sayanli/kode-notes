@@ -4,14 +4,15 @@ import (
 	"context"
 	"fmt"
 	"kode-notes/internal/entity"
-	"kode-notes/pkg/postgres"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type UserRepository struct {
-	*postgres.Postgres
+	*pgxpool.Pool
 }
 
-func NewUserRepository(pg *postgres.Postgres) *UserRepository {
+func NewUserRepository(pg *pgxpool.Pool) *UserRepository {
 	return &UserRepository{
 		pg,
 	}

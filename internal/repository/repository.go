@@ -3,7 +3,8 @@ package repository
 import (
 	"context"
 	"kode-notes/internal/entity"
-	"kode-notes/pkg/postgres"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type User interface {
@@ -21,7 +22,7 @@ type Repositories struct {
 	Note
 }
 
-func NewRepositories(pg *postgres.Postgres) *Repositories {
+func NewRepositories(pg *pgxpool.Pool) *Repositories {
 	return &Repositories{
 		User: NewUserRepository(pg),
 		Note: NewNoteRepository(pg),

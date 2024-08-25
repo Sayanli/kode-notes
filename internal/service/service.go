@@ -27,11 +27,17 @@ type ServicesDependencies struct {
 	Repos    *repository.Repositories
 	SignKey  string
 	TokenTTL time.Duration
+	Salt     string
 }
 
 func NewService(deps ServicesDependencies) *Service {
 	return &Service{
-		Auth: NewAuthService(deps.Repos.User),
+		Auth: NewAuthService(AuthDependencies{
+			userRepo: deps.Repos.User,
+			signKey:  deps.SignKey,
+			tokenTTL: deps.TokenTTL,
+			salt:     deps.Salt,
+		}),
 		Note: NewNoteService(deps.Repos.Note),
 	}
 }

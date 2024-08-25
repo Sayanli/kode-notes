@@ -4,14 +4,15 @@ import (
 	"context"
 	"fmt"
 	"kode-notes/internal/entity"
-	"kode-notes/pkg/postgres"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type NoteRepository struct {
-	*postgres.Postgres
+	*pgxpool.Pool
 }
 
-func NewNoteRepository(pg *postgres.Postgres) *NoteRepository {
+func NewNoteRepository(pg *pgxpool.Pool) *NoteRepository {
 	return &NoteRepository{
 		pg,
 	}

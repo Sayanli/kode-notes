@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -30,47 +29,30 @@ type PgxPool interface {
 	Ping(ctx context.Context) error
 }
 
-type Postgres struct {
-	maxPoolSize  int
-	connAttempts int
-	connTimeout  time.Duration
-	Pool         PgxPool
+type PostgresConfig struct {
+	ConnectionString string
+	MaxConns         int
 }
 
-func New(url string) (*Postgres, error) {
-	pg := &Postgres{
-		maxPoolSize:  defaultMaxPoolSize,
-		connAttempts: defaultConnAttempts,
-		connTimeout:  defaultConnTimeout,
+func NewPostgresPool(config PostgresConfig) (*pgxpool.Pool, error) {
+	if config.MaxConns == 0 {
+		config.MaxConns = defaultMaxPoolSize
 	}
-
-	poolConfig, err := pgxpool.ParseConfig(url)
+	poolConfig, err := pgxpool.ParseConfig(config.ConnectionString)
 	if err != nil {
 		return nil, fmt.Errorf("pgdb - New - pgxpool.ParseConfig: %w", err)
 	}
 
-	poolConfig.MaxConns = int32(pg.maxPoolSize)
-
-	for pg.connAttempts > 0 {
-		pg.Pool, err = pgxpool.NewWithConfig(context.Background(), poolConfig)
-		if err == nil {
-			break
-		}
-
-		log.Printf("Postgres is trying to connect, attempts left: %d", pg.connAttempts)
-		time.Sleep(pg.connTimeout)
-		pg.connAttempts--
-	}
-
+	poolConfig.MaxConns = int32(config.MaxConns)
+	pool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
 	if err != nil {
-		return nil, fmt.Errorf("pgdb - New - pgxpool.ConnectConfig: %w", err)
+		return nil, err
 	}
 
-	return pg, nil
-}
-
-func (p *Postgres) Close() {
-	if p.Pool != nil {
-		p.Pool.Close()
+	// Проверка подключения
+	if err := pool.Ping(context.Background()); err != nil {
+		return nil, err
 	}
+
+	return pool, nil
 }
