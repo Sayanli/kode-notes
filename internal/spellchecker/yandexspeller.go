@@ -1,6 +1,7 @@
 package spellchecker
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"io/ioutil"
 	"kode-notes/internal/entity"
@@ -29,7 +30,16 @@ func (y *YandexSpellChecker) Check(text string) ([]byte, error) {
 	//Yandex speller принимает текст с '+' вместо пробелов
 	modifiedText := strings.ReplaceAll(text, " ", "+")
 
-	resp, err := http.Get(apiURL + modifiedText)
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{
+		Transport: transport,
+	}
+
+	resp, err := client.Get(apiURL + modifiedText)
 	if err != nil {
 		return nil, err
 	}

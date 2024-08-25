@@ -37,7 +37,7 @@ func (r *NoteRepository) GetNotes(ctx context.Context, userId int) ([]entity.Not
 
 	for rows.Next() {
 		var note entity.Note
-		if err := rows.Scan(&note.Id, &note.UserId, &note.Text); err != nil {
+		if err := rows.Scan(&note.Id, &note.UserId, &note.Text, &note.Mistakes); err != nil {
 			return nil, fmt.Errorf("repository - GetNotes - rows.Scan: %w", err)
 		}
 		notes = append(notes, note)
