@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fmt"
+	"log"
 	"path"
 	"time"
 
@@ -24,6 +24,7 @@ type (
 	}
 
 	HTTP struct {
+		Host string `yaml:"host" env:"HTTP_HOST"`
 		Port string `yaml:"port" env:"HTTP_PORT"`
 	}
 
@@ -48,10 +49,13 @@ type (
 
 func NewConfig(configPath string) (*Config, error) {
 	cfg := &Config{}
+	if configPath == "" {
+		log.Fatal("config path is not set")
+	}
 
 	err := cleanenv.ReadConfig(path.Join("./", configPath), cfg)
 	if err != nil {
-		return nil, fmt.Errorf("error reading config file: %w", err)
+		log.Fatalf("error reading config file: %s", err)
 	}
 
 	return cfg, nil

@@ -14,7 +14,7 @@ type User interface {
 
 type Note interface {
 	GetNotes(ctx context.Context, userId int) ([]entity.Note, error)
-	CreateNote(ctx context.Context, userId int, text string) error
+	CreateNote(ctx context.Context, userId int, text string, mistakes []byte) error
 }
 
 type Repositories struct {

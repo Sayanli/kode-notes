@@ -4,6 +4,7 @@ import (
 	"context"
 	"kode-notes/internal/entity"
 	"kode-notes/internal/repository"
+	"kode-notes/internal/spellchecker"
 	"time"
 )
 
@@ -28,6 +29,7 @@ type ServicesDependencies struct {
 	SignKey  string
 	TokenTTL time.Duration
 	Salt     string
+	Speller  spellchecker.SpellChecker
 }
 
 func NewService(deps ServicesDependencies) *Service {
@@ -38,6 +40,6 @@ func NewService(deps ServicesDependencies) *Service {
 			tokenTTL: deps.TokenTTL,
 			salt:     deps.Salt,
 		}),
-		Note: NewNoteService(deps.Repos.Note),
+		Note: NewNoteService(deps.Repos.Note, deps.Speller),
 	}
 }

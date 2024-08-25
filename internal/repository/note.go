@@ -18,8 +18,8 @@ func NewNoteRepository(pg *pgxpool.Pool) *NoteRepository {
 	}
 }
 
-func (r *NoteRepository) CreateNote(ctx context.Context, userId int, text string) error {
-	_, err := r.Pool.Exec(ctx, "INSERT INTO notes (user_id, text) VALUES ($1, $2)", userId, text)
+func (r *NoteRepository) CreateNote(ctx context.Context, userId int, text string, mistakes []byte) error {
+	_, err := r.Pool.Exec(ctx, "INSERT INTO notes (user_id, text, mistakes) VALUES ($1, $2, $3)", userId, text, mistakes)
 	if err != nil {
 		return fmt.Errorf("repository - CreateNote - r.Pool.Exec: %w", err)
 	}
@@ -29,7 +29,7 @@ func (r *NoteRepository) CreateNote(ctx context.Context, userId int, text string
 func (r *NoteRepository) GetNotes(ctx context.Context, userId int) ([]entity.Note, error) {
 	notes := make([]entity.Note, 0)
 
-	rows, err := r.Pool.Query(ctx, "SELECT id, user_id, text FROM notes WHERE user_id = $1", userId)
+	rows, err := r.Pool.Query(ctx, "SELECT id, user_id, text, mistakes FROM notes WHERE user_id = $1", userId)
 	if err != nil {
 		return nil, fmt.Errorf("repository - GetNotes - r.Pool.Query: %w", err)
 	}
