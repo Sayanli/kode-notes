@@ -6,11 +6,19 @@ import (
 	"io/ioutil"
 	"kode-notes/internal/entity"
 	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 )
 
 type YandexSpellChecker struct {
+	logger *slog.Logger
+}
+
+func NewYandexSpellChecker(logger *slog.Logger) *YandexSpellChecker {
+	return &YandexSpellChecker{
+		logger: logger,
+	}
 }
 
 type InputItem struct {
@@ -26,6 +34,9 @@ type InputItem struct {
 const apiURL = "https://speller.yandex.net/services/spellservice.json/checkText?text="
 
 func (y *YandexSpellChecker) Check(text string) ([]byte, error) {
+	const op = "spellchecker.YandexSpellChecker.Check"
+	y.logger = y.logger.With("op", op)
+
 	var inputItems []InputItem
 	//Yandex speller принимает текст с '+' вместо пробелов
 	modifiedText := strings.ReplaceAll(text, " ", "+")
@@ -41,17 +52,20 @@ func (y *YandexSpellChecker) Check(text string) ([]byte, error) {
 
 	resp, err := client.Get(apiURL + modifiedText)
 	if err != nil {
+		y.logger.Error("cannot get response", slog.String("url", apiURL+modifiedText))
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		y.logger.Error("cannot read body", slog.String("url", apiURL+modifiedText))
 		return nil, err
 	}
 
 	err = json.Unmarshal(body, &inputItems)
 	if err != nil {
+		y.logger.Error("cannot unmarshal body", slog.String("url", apiURL+modifiedText))
 		log.Fatalf("Error unmarshalling input JSON: %v", err)
 	}
 	var outputItems []entity.Mistakes
@@ -64,11 +78,8 @@ func (y *YandexSpellChecker) Check(text string) ([]byte, error) {
 
 	mistakes, err := json.Marshal(outputItems)
 	if err != nil {
+		y.logger.Error("cannot marshal body", slog.String("url", apiURL+modifiedText))
 		log.Fatalf("Error marshalling output JSON: %v", err)
 	}
 	return mistakes, nil
-}
-
-func NewYandexSpellChecker() *YandexSpellChecker {
-	return &YandexSpellChecker{}
 }

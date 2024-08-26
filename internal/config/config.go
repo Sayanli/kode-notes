@@ -47,7 +47,7 @@ type (
 	}
 )
 
-func NewConfig(configPath string) (*Config, error) {
+func NewConfig(configPath string) *Config {
 	cfg := &Config{}
 	if configPath == "" {
 		log.Fatal("config path is not set")
@@ -58,5 +58,5 @@ func NewConfig(configPath string) (*Config, error) {
 		log.Fatalf("error reading config file: %s", err)
 	}
 
-	return cfg, nil
+	return cfg
 }

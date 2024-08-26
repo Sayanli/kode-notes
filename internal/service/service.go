@@ -5,6 +5,7 @@ import (
 	"kode-notes/internal/entity"
 	"kode-notes/internal/repository"
 	"kode-notes/internal/spellchecker"
+	"log/slog"
 	"time"
 )
 
@@ -26,6 +27,7 @@ type Service struct {
 
 type ServicesDependencies struct {
 	Repos    *repository.Repositories
+	Logger   *slog.Logger
 	SignKey  string
 	TokenTTL time.Duration
 	Salt     string
@@ -36,10 +38,11 @@ func NewService(deps ServicesDependencies) *Service {
 	return &Service{
 		Auth: NewAuthService(AuthDependencies{
 			userRepo: deps.Repos.User,
+			logger:   deps.Logger,
 			signKey:  deps.SignKey,
 			tokenTTL: deps.TokenTTL,
 			salt:     deps.Salt,
 		}),
-		Note: NewNoteService(deps.Repos.Note, deps.Speller),
+		Note: NewNoteService(deps.Repos.Note, deps.Speller, deps.Logger),
 	}
 }

@@ -20,10 +20,7 @@ const (
 )
 
 func Run(path string) {
-	cfg, err := config.NewConfig(path)
-	if err != nil {
-		panic(err)
-	}
+	cfg := config.NewConfig(path)
 
 	log := setupLogger(cfg.Level)
 	log = log.With(slog.String("env", cfg.Level))
@@ -39,9 +36,10 @@ func Run(path string) {
 	}
 
 	repo := repository.NewRepositories(pg)
-	yandexspeller := spellchecker.NewYandexSpellChecker()
+	yandexspeller := spellchecker.NewYandexSpellChecker(log)
 	service := service.NewService(service.ServicesDependencies{
 		Repos:    repo,
+		Logger:   log,
 		SignKey:  cfg.SignKey,
 		TokenTTL: cfg.TokenTTL,
 		Salt:     cfg.Salt,

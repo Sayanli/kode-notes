@@ -10,6 +10,7 @@ import (
 type Server struct {
 	handler *Handler
 	router  *chi.Mux
+	address string
 }
 
 func NewServer(handler *Handler, router *chi.Mux) *Server {
